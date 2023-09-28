@@ -36,3 +36,14 @@ example (I  : Ideal R)  (I0 : Ideal (R ⧸ I)) :
        (Ideal.Quotient.mk I)''((Ideal.Quotient.mk I)⁻¹' I0 ) = I0 := by
   sorry
 
+/- 有限集合の全単射 -/
+
+universe u
+
+variable (S : Finset u)
+#check S
+variable (f : S → S)
+#check f
+
+example  (H : Function.Injective f) : Function.Surjective f := by
+  sorry 
