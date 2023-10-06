@@ -1,36 +1,74 @@
 import Mathlib
 
+variable (α : ℝ)
+
+def seqA : Nat → Nat
+  | 0  =>  2
+  | n+1 => 3 * seqA n
+
+#eval seqA 2
+
+
+
 /- 入試問題　-/
 -- 等比数列
-example (p α: ℝ) (a : ℕ → ℝ) 
-  (h1 : a n+1 = p*(a n)) 
+example (p α: ℝ) (ppos : p > 0) (a : ℕ → ℝ) 
   (h0 : a 0 = α)
-  : a n = p^(n-1)*α := by
-  sorry
+  (h1 : ∀n, a n.succ = p*(a n)) 
+    : a n = (p^n) *α := by
+  induction' n with n ih
+  · simp
+    exact h0
+  · specialize h1 n
+    rw [h1]
+    rw [ih]
+    simp
+    rw [add_comm]
+    --nth_rewrite 2 [Real.rpow_add ppos 1 n]
+    rw [← mul_assoc]
+    nth_rewrite 1 [← Real.rpow_one p]
+    rw [Real.rpow_add]
+    simp 
+    assumption
+    
+
+#check pow_add
+#check Monoid
+
+
+      
+example ( p n :ℝ) (ppos : p > 0) : p^(1 + n) = p^1*p^n := by
+  exact Real.rpow_add ppos 1 n 
+
     
   
-
 
 /- 素数の無限性 -/
 
 /- 証明駆動開発 -/
-example (a : ℕ → ℝ) (h : a n+1 = a n + n^2) : 
+example (a : ℕ → ℝ) (h0 : ∀n, a n+1 = a n + n^2)  
+  (h1 : a 0 = 0): 
   a n = (1/6)*n*(n+1)*(2*n + 1) := by
+  induction' n with n ih
+  · simp
+    exact h1 
   sorry
+  
+
 
 /-  AM の Lean への翻訳 -/
 
-variable [CommRing R] (I : Ideal R)
+variable (R : Type u) [CommRing R] (I : Ideal R)
 #check Ideal.Quotient.mk I
 #check R⧸I
 
 
 example ( J : Ideal R)  : I*J ≤ I ⊓ J := by 
-  sorry
+  exact Ideal.mul_le_inf
 
 example ( J : Ideal R) (h : J ≥ I) :
   (Ideal.Quotient.mk I)⁻¹' ((Ideal.Quotient.mk I)'' J) = J := by
-  sorry 
+  sorry
 
 example (I  : Ideal R)  (I0 : Ideal (R ⧸ I)) :
        (Ideal.Quotient.mk I)''((Ideal.Quotient.mk I)⁻¹' I0 ) = I0 := by
