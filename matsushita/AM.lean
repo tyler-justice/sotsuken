@@ -173,6 +173,66 @@ example : mynilradical (A ⧸ mynilradical A) = ⊥ :=  by
   定義 A 環, Jacobson 根基とは A の極大イデアル全部の共通集合
 -/
 
+example :  x ∈ sInf {J : Ideal A | J.IsMaximal} ↔ ∀y : A, IsUnit (1 - x*y) := by
+  constructor 
+  · intro H1
+    by_contra H2 
+    push_neg at H2  
+    cases H2 with 
+    | intro y H3 => _
+    have H4 : ∃ M : Ideal A, M.IsMaximal ∧ (1 - x*y) ∈ M := by 
+      exact exists_max_ideal_of_mem_nonunits H3
+    cases H4 with
+    | intro M HM => _ 
+    cases HM with 
+    | intro HM1 HM2 => _ 
+    have H6 : x ∈ M := by 
+      apply Ideal.mem_sInf.mp H1 
+      exact HM1
+    have H7 : x*y ∈ M := by exact Ideal.mul_mem_right y M H6
+    have H8 : 1 ∈ M := by exact Iff.mp (Submodule.sub_mem_iff_left M H7) HM2 
+    have H9 : M = ⊤ := by exact Iff.mpr (Ideal.eq_top_iff_one M) H8
+    have H10 : M ≠ ⊤ := by exact Ideal.IsPrime.ne_top'
+    exact H10 H9
+  · intro H1
+    by_contra H2 
+    have H3 : ∃ M : Ideal A, M.IsMaximal ∧ x ∉ M  := by
+      by_contra H4 
+      push_neg at H4
+      have H5 : x ∈ sInf {J : Ideal A| J.IsMaximal} := by exact Iff.mpr Ideal.mem_sInf H4
+      exact H2 H5 
+    cases H3 with
+    | intro  M HM => _ 
+    cases HM with
+    | intro HMax Hnotx => _ 
+    have H6 : Ideal.span ({x} ∪ M) = ⊤ := by sorry
+    have H7 : ∃(a : A), ∃(t : M), a*x + t = 1 := by sorry
+    cases H7 with
+    | intro a H8 => _  
+    cases H8 with 
+    | intro t H9 => _ 
+    have H10 : ¬IsUnit (1 - a*x) := by sorry
+    sorry
+
+    
+
+    
+
+    
+    
+    
+
+    
+    
+      
+             
+        
+      
+
+
+  
+
+
 /-
   I A の Jacobson 根基とする. x ∈ I ↔ ∀ y ∈ A, 1 - xy が単元
 -/
