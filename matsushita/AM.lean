@@ -125,6 +125,18 @@ def mynilradical (R : Type u) [CommSemiring R] : Ideal R where
     simp
     
 
+lemma lemnil  (x : A) (n : ℕ )(h : x^n ∈ mynilradical A) : x ∈ mynilradical A := by
+  have hnm : ∃ m : ℕ, (x^n)^m = 0 := by
+    exact h
+  cases hnm with
+  | intro m H => _
+  have H1 : x^(m*n) = 0 := by 
+    rw [← H]
+    ring 
+  have H2 : ∃ N : ℕ, x^N = 0:= by
+    exact Exists.intro (m * n) H1
+  exact H2
+
 example : mynilradical (A ⧸ mynilradical A) = ⊥ :=  by
   refine Iff.mpr (Submodule.eq_bot_iff (mynilradical (A ⧸ mynilradical A))) ?_
   intro x H
@@ -135,14 +147,18 @@ example : mynilradical (A ⧸ mynilradical A) = ⊥ :=  by
     | intro n Hn => _ 
   cases hsurjective with
     | intro t Ht => _ 
-  have kernel : t ∈ mynilradical A := by 
-    sorry
-  sorry
-    
-    
-  
+  have kernel : t ∈ mynilradical A := by
+       have image_t : (Ideal.Quotient.mk (mynilradical A)) t^n = 0 := by
+          rw [← Hn]
+          exact congrFun (congrArg HPow.hPow Ht) n
+       have kernel2 : t^n ∈ mynilradical A := by
+         exact Iff.mp SModEq.zero image_t 
+       exact lemnil A t n kernel2
+  have Hfinal : (Ideal.Quotient.mk (mynilradical A)) t = 0 := by
+    exact Iff.mpr Ideal.Quotient.eq_zero_iff_mem kernel
+  rw [← Ht]
+  assumption 
 
-  
 
 
 
