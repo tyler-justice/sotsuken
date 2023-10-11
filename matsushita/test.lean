@@ -1,5 +1,6 @@
 import Mathlib
 
+
 variable (α : ℝ)
 
 def seqA : Nat → Nat
@@ -43,28 +44,34 @@ example ( p n :ℝ) (ppos : p > 0) : p^(1 + n) = p^1*p^n := by
     
   
 
+
 /- 素数の無限性 -/
 
 /- 証明駆動開発 -/
-example (a : ℕ → ℝ) (h0 : ∀n, a n+1 = a n + n^2)  
-  (h1 : a 0 = 0): 
+sawaguchi
+example (a : ℕ → ℝ) (h : ∀ n, a (n+1) = a n + (n+1)^2) (h0 :a 0 = 0):
   a n = (1/6)*n*(n+1)*(2*n + 1) := by
   induction' n with n ih
-  · simp
-    exact h1 
-  sorry
-  
-
+  · simp [h0]
+  simp at *
+  rw [Nat.succ_eq_add_one]
+  specialize h (n)
+  nth_rewrite 1 [ih] at h
+  rw [h]
+  ring
 
 /-  AM の Lean への翻訳 -/
 
-variable (R : Type u) [CommRing R] (I : Ideal R)
+variable [CommRing R] (I : Ideal R)
+
 #check Ideal.Quotient.mk I
 #check R⧸I
 
 
+
 example ( J : Ideal R)  : I*J ≤ I ⊓ J := by 
   exact Ideal.mul_le_inf
+
 
 example ( J : Ideal R) (h : J ≥ I) :
   (Ideal.Quotient.mk I)⁻¹' ((Ideal.Quotient.mk I)'' J) = J := by
@@ -83,5 +90,7 @@ variable (S : Finset u)
 variable (f : S → S)
 #check f
 
+
 example  (H : Function.Injective f) : Function.Surjective f := by 
   exact Finite.surjective_of_injective H
+
