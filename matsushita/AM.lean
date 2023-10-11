@@ -54,11 +54,36 @@ example (m : Ideal A) (h_proper : m ≠ ⊤) (h_max : Ideal.IsMaximal m)
   apply_assumption [thm1]
   assumption 
   intro x x_not_in_m
-  have lem1 :  Ideal.span ({x} ∪ (m : Set A)) = ⊤ := by sorry
-  have lem2 : ∃ y : A, ∃ t : m, x*y  = 1 + t:= by sorry
+  have lem1 :  Ideal.span {x} ⊔ m  = ⊤ := by 
+    by_contra H0 
+    apply x_not_in_m
+    push_neg at H0
+    have H1 : m ≤ Ideal.span {x} ⊔ m := by exact le_sup_right
+    have H2 : m = Ideal.span {x} ⊔ m  := by 
+      exact Ideal.IsMaximal.eq_of_le h_max H0 H1 
+    rw [H2]
+    have H3 : x ∈ Ideal.span {x} := by exact Ideal.mem_span_singleton_self x
+    exact Ideal.mem_sup_left H3
+  have lem2 : ∃ y t : A, t ∈ m ∧ y*x + t  = 1  := by 
+    exact Ideal.IsMaximal.exists_inv h_max x_not_in_m
   cases lem2 with
-    | intro y Hy =>
-  have lem3 : IsUnit (x*y)  := by sorry
+    | intro y Hy => _ 
+  cases Hy with
+    | intro t Ht => _ 
+  cases Ht with 
+    | intro H4 H5 => _ 
+  have lem3 : IsUnit (x*y)  := by 
+    have lem4 : x*y = 1 - t := by
+      calc x*y = x*y + t - t := by rw [add_sub_cancel]
+          _ = y*x + t - t := by ring
+          _  = 1 - t := by rw [H5]      
+    rw [lem4]
+    have lem5 : -t ∈ m := by exact Submodule.neg_mem m H4
+    specialize H (-t) 
+    have lem6 : 1 + -t = 1-t := by ring
+    rw [lem6] at H 
+    apply H
+    assumption 
   exact isUnit_of_mul_isUnit_left lem3
 
 
@@ -173,6 +198,10 @@ example : mynilradical (A ⧸ mynilradical A) = ⊥ :=  by
   定義 A 環, Jacobson 根基とは A の極大イデアル全部の共通集合
 -/
 
+/-
+  I A の Jacobson 根基とする. x ∈ I ↔ ∀ y ∈ A, 1 - xy が単元
+-/
+
 example :  x ∈ sInf {J : Ideal A | J.IsMaximal} ↔ ∀y : A, IsUnit (1 - x*y) := by
   constructor 
   · intro H1
@@ -205,37 +234,29 @@ example :  x ∈ sInf {J : Ideal A | J.IsMaximal} ↔ ∀y : A, IsUnit (1 - x*y)
     | intro  M HM => _ 
     cases HM with
     | intro HMax Hnotx => _ 
-    have H6 : Ideal.span ({x} ∪ M) = ⊤ := by sorry
-    have H7 : ∃(a : A), ∃(t : M), a*x + t = 1 := by sorry
-    cases H7 with
-      | intro a H8  => _ 
-    cases H8 with 
-      | intro t H9 => _ 
-    have H10 : ¬IsUnit (1 - a*x) := by sorry
-    sorry
-
-    
-
-    
-
-    
-    
-    
-
-    
-    
+    have H6 : ∃(a t : A), t ∈ M ∧ a*x + t = 1 := by 
+      exact Ideal.IsMaximal.exists_inv HMax Hnotx 
+    cases H6 with
+      | intro a H7  => _ 
+    cases H7 with 
+      | intro t H8 => _ 
+    cases H8 with
+    | intro tM atM => _ 
+    have H9 : ¬ IsUnit (1 - x*a) := by 
+      have h0 : 1 - x*a ∈ M := by 
+        calc 1 - x*a = (a*x + t) - x*a := by rw [atM]
+                   _ = t := by ring                   
+        exact tM 
+      by_contra h3 
+      have h2 : M = ⊤ := by
+        exact Ideal.eq_top_of_isUnit_mem M h0 h3 
+      have h4 : M ≠ ⊤ := by exact Ideal.IsPrime.ne_top'
+      exact h4 h2
+    apply H9 
+    specialize H1 a
+    assumption
       
-             
-        
-      
 
-
-  
-
-
-/-
-  I A の Jacobson 根基とする. x ∈ I ↔ ∀ y ∈ A, 1 - xy が単元
--/
 
 /-
  A 環, I_1, ... , I_n A のイデアル
