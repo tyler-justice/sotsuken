@@ -208,9 +208,9 @@ example :  x ∈ sInf {J : Ideal A | J.IsMaximal} ↔ ∀y : A, IsUnit (1 - x*y)
     have H6 : Ideal.span ({x} ∪ M) = ⊤ := by sorry
     have H7 : ∃(a : A), ∃(t : M), a*x + t = 1 := by sorry
     cases H7 with
-    | intro a H8 => _  
+      | intro a H8  => _ 
     cases H8 with 
-    | intro t H9 => _ 
+      | intro t H9 => _ 
     have H10 : ¬IsUnit (1 - a*x) := by sorry
     sorry
 
