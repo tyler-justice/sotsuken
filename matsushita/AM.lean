@@ -11,56 +11,71 @@ A 環, x nonunit → x を含む極大イデアルが存在
 -/
 universe u
 
-variable (A : Type u) [CommRing A]
+variable (A : Type u) [CommRing A] [Nontrivial A]
 
 example (x : A) (h : ¬IsUnit x) : ∃m, Ideal.IsMaximal m ∧ x ∈ m := by
-  sorry 
+  exact exists_max_ideal_of_mem_nonunits h
 
 /-
  A 環, m A のイデアルで ∀x ∈ A \ m は unit → A local ring, m maximal
 -/
 
-example (m : Ideal A) (H : ∀(x : A), x ∉  m → IsUnit x) : 
+theorem thm1  (m : Ideal A) (Htop : m ≠ ⊤) (H : ∀(x : A), x ∉  m → IsUnit x) : 
   LocalRing A:= by
-  sorry
+  apply_assumption [LocalRing.of_nonunits_add]
+  intros a b Ha Hb
+  have lema : a ∈  m := by
+    contrapose! H
+    push_neg 
+    use a 
+    constructor
+    ·assumption
+    ·assumption 
+  have lemb : b ∈  m := by
+    contrapose! H
+    use b 
+    constructor
+    ·assumption
+    ·assumption 
+  have ha_plus_b : a + b ∈ m := by
+    exact Ideal.add_mem m lema lemb
+  have hnonunit : (m : Set A) ⊆ nonunits A := by exact coe_subset_nonunits Htop
+  exact Set.mem_of_subset_of_mem hnonunit ha_plus_b
+  
+
 
 /-
   m : A のイデアル, 1 + m の元は unit → A は local ring
 -/
 
-example (m : Ideal A) (H : ∀(x : A), x ∈ m → IsUnit (1 + x)) : 
+example (m : Ideal A) (h_proper : m ≠ ⊤) (h_max : Ideal.IsMaximal m) 
+  (H : ∀(x : A), x ∈ m → IsUnit (1 + x)) : 
   LocalRing A := by
-  sorry 
-
-example (m n : ℕ) (h : c ∈ Finset.range (m+n+ 1)) : (0 ≤ c ∧ c ≤ m )∨ (m < c ∧ c ≤ m + n) := by
-  sorry
-    
-example  (b : A) (m n c : ℕ)  (H : n ≥ c ): b^(m + n - c) = b^(m + (n-c)) := by
-  rw [Nat.add_sub_assoc ?h m]
+  apply_assumption [thm1]
   assumption 
+  intro x x_not_in_m
+  have lem1 :  Ideal.span ({x} ∪ (m : Set A)) = ⊤ := by sorry
+  have lem2 : ∃ y : A, ∃ t : m, x*y  = 1 + t:= by sorry
+  cases lem2 with
+    | intro y Hy =>
+  have lem3 : IsUnit (x*y)  := by sorry
+  exact isUnit_of_mul_isUnit_left lem3
 
-example  (m n c : ℕ) (h : n  ≥ c) : m + n - c = m + (n-c) := by
-    rw  [Nat.add_sub_assoc ?h m]
-    assumption 
-  
-example (m n : ℕ) (h : m - n ≥ 0) : m ≥ n := by 
-  apply?
-  
-example  : 3 - 5 = -2 := by exact rfl
 
-variable (m n c : ℕ)
+example (c m : ℕ) : ¬(c ≤ m) ↔ m < c := by exact Nat.not_le
 
-#check n+m-c 
-
+    
 /-
  n : A の冪零元からなる集合 → n は素イデアル, A/n に冪零元なし
 -/
-def mynilradical (I : Ideal A) : Ideal A where
+def mynilradical (R : Type u) [CommSemiring R] : Ideal R where
   carrier := { a | ∃n : ℕ, a^n = 0}
   zero_mem' := by
     simp 
-    use 1 
-    rw [pow_one]
+    use 1
+    exact pow_one 0
+    
+    
 
   add_mem' := by
     simp
@@ -72,7 +87,7 @@ def mynilradical (I : Ideal A) : Ideal A where
     have Term :
           ∀ c ∈ Finset.range (Nat.succ (m + n)), a ^ c * b ^ (m + n - c) * Nat.choose (m + n) c = 0
           := by
-          intros c H 
+          intros c 
           by_cases P : c ≤ m
           · have BC : b^(m + n - c) = 0  := by
               have HN : b^n*b^(m - c) = b^(n + m - c):= by 
@@ -84,37 +99,21 @@ def mynilradical (I : Ideal A) : Ideal A where
               rw [Hb]
               simp
             rw [BC]
-            simp
-          
-          have nP : c > m := by exact not_le.mp P 
-          have BC2 : a^c = 0 := by 
-            have HNN : a^m * a^(c-m) = a^c  := by
-              rw [← pow_add]              
-              rw [← Nat.add_sub_assoc ?nP m]
-              rw [add_comm]
-              rw [Nat.add_sub_self_right]
-              exact Nat.le_of_lt nP
-          rw [BC2]
-          simp           
+            simp 
+          · have BC2 : a^c = 0 := by 
+              have nP : c > m := by exact not_le.mp P 
+              have HNN : a^m * a^(c-m) = a^c  := by
+                rw [← pow_add]              
+                rw [← Nat.add_sub_assoc ?nP m]
+                rw [add_comm]
+                rw [Nat.add_sub_self_right]
+                exact Nat.le_of_lt nP
+              rw [←HNN]
+              rw [Ha]  
+              simp
+            rw [BC2]
+            simp           
     exact Finset.sum_eq_zero Term
-          
-  /- fun {x y} ⟨m, hxmi⟩ ⟨n, hyni⟩ =>
-    ⟨m + n,
-      (add_pow x y (m + n)).symm ▸ I.sum_mem <|
-        show
-          ∀ c ∈ Finset.range (Nat.succ (m + n)), x ^ c * y ^ (m + n - c) * Nat.choose (m + n) c = 0
-          from fun c _ =>
-          Or.casesOn (le_total c m) (fun hcm =>
-              I.mul_mem_right _ <|
-                I.mul_mem_left _ <|
-                  Nat.add_comm n m ▸
-                    (add_tsub_assoc_of_le hcm n).symm ▸
-                      (pow_add y n (m - c)).symm ▸ I.mul_mem_right _ hyni) (fun hmc =>
-               I.mul_mem_right _ <|
-                I.mul_mem_right _ <|
-                  add_tsub_cancel_of_le hmc ▸ (pow_add x m (c - m)).symm ▸ I.mul_mem_right _ hxmi)⟩
-  -/
-  -- smul_mem' {r s} := by exact fun ⟨n, h⟩ ↦ ⟨n,(mul_pow r s n).symm ▸ (r^n) h⟩
   smul_mem' := by
     intros r s 
     dsimp 
@@ -125,6 +124,27 @@ def mynilradical (I : Ideal A) : Ideal A where
     rw [H]
     simp
     
+
+example : mynilradical (A ⧸ mynilradical A) = ⊥ :=  by
+  refine Iff.mpr (Submodule.eq_bot_iff (mynilradical (A ⧸ mynilradical A))) ?_
+  intro x H
+  have hnil : ∃ n : ℕ, x^n = 0 := by exact H
+  have hsurjective : ∃ t : A, (Ideal.Quotient.mk (mynilradical A)) t = x := by
+    exact Quot.exists_rep x
+  cases hnil with
+    | intro n Hn => _ 
+  cases hsurjective with
+    | intro t Ht => _ 
+  have kernel : t ∈ mynilradical A := by 
+    sorry
+  sorry
+    
+    
+  
+
+  
+
+
 
 
 
@@ -147,3 +167,4 @@ def mynilradical (I : Ideal A) : Ideal A where
  1. φ が全射 ↔ ∀ i ≠ j, I_i + I_j = (1)
  2. φ が単射 ↔ ⋂ I_i = (0)
 -/
+

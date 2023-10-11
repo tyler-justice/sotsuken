@@ -83,5 +83,5 @@ variable (S : Finset u)
 variable (f : S → S)
 #check f
 
-example  (H : Function.Injective f) : Function.Surjective f := by
-  sorry 
+example  (H : Function.Injective f) : Function.Surjective f := by 
+  exact Finite.surjective_of_injective H
