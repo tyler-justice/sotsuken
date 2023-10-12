@@ -277,6 +277,14 @@ example [Fintype ι] ( f : ι → Ideal A) (g : A →+* ∀ i, A ⧸ f i ) :
     (ker g) = (⨅ i, f i) := by sorry
     -/
 
-example (I J : Ideal A) (g : A →+* (A ⧸ I) × (A ⧸ J)) : RingHom.ker g = I ⊓ J := by 
-  refine Eq.symm (Ideal.ext ?h)
-  sorry
+example (I J : Ideal A) (g : A →+* (A ⧸ I) × A ⧸ J) : RingHom.ker g = I ⊓ J := by 
+  apply Ideal.ext
+  intro x 
+  constructor
+  · intro H 
+    sorry
+  · intro H 
+    refine Iff.mpr (RingHom.mem_ker g) ?h.mpr.a
+    sorry 
+
+  
