@@ -54,7 +54,7 @@ example (m : Ideal A) (h_proper : m ≠ ⊤) (h_max : Ideal.IsMaximal m)
   apply_assumption [thm1]
   assumption 
   intro x x_not_in_m
-  have lem1 :  Ideal.span {x} ⊔ m  = ⊤ := by 
+  have :  Ideal.span {x} ⊔ m  = ⊤ := by 
     by_contra H0 
     apply x_not_in_m
     push_neg at H0
@@ -265,3 +265,18 @@ example :  x ∈ sInf {J : Ideal A | J.IsMaximal} ↔ ∀y : A, IsUnit (1 - x*y)
  2. φ が単射 ↔ ⋂ I_i = (0)
 -/
 
+
+/-
+example [Fintype ι] ( f : ι → Ideal A) : 
+      A →+* ∀ i, A ⧸ f i  := by
+     exact algebraMap A ((i : ι) → A ⧸ f i)
+-/
+
+/-
+example [Fintype ι] ( f : ι → Ideal A) (g : A →+* ∀ i, A ⧸ f i ) : 
+    (ker g) = (⨅ i, f i) := by sorry
+    -/
+
+example (I J : Ideal A) (g : A →+* (A ⧸ I) × (A ⧸ J)) : RingHom.ker g = I ⊓ J := by 
+  refine Eq.symm (Ideal.ext ?h)
+  sorry
