@@ -41,6 +41,7 @@ theorem leftside (h:Surjective f) : Injective f :=by
 #check toSet
 #check Finset.toSet S
 
+--changed
 
 
 end
