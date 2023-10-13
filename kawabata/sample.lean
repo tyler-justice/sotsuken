@@ -15,7 +15,7 @@ theorem exists_prime_factor {n : ℕ } (h : 2 ≤ n) :
 
   by_cases np : Nat.Prime n
   {use n}
-  induction' n using Nat.strong_induction_on with n ih 
+  induction' n using Nat.strong_induction_on with n ih
   --何故P(0)出ない？--
   rw [Nat.prime_def_lt] at np
   push_neg at np
@@ -25,22 +25,24 @@ theorem exists_prime_factor {n : ℕ } (h : 2 ≤ n) :
     rw [mz, zero_dvd_iff] at mdvdn
     linarith }
   have mgt2 : 2 ≤ m
-  {sorry} --two_le this mne1--
+  {rw [Nat.two_le_iff]
+   refine ⟨ mne0 , mne1⟩ } --two_le this mne1--
   by_cases mp : Nat.Prime m
   exists m
   {rcases ih m mltn mgt2 mp with ⟨p, pp, pdvd⟩
    exists p
    refine ⟨ pp, pdvd.trans mdvdn⟩}
 
-
+open Nat --open Natで各タクティクのNat消せる--
 theorem primes_infinite : ∀ n, ∃ p > n, Nat.Prime p := by
  intro n
   
- have h : 2 ≤ Nat.factorial (n + 1) + 1
+ have h : 2 ≤ factorial (n + 1) + 1
  { apply Nat.succ_le_succ
    exact Nat.succ_le_of_lt (Nat.factorial_pos _)}
  rcases exists_prime_factor h with ⟨p, pp, pdvd⟩
- exists p   --refine で何故かnogoal--
+ exists p  
+  --refine で何故かnogoal--
  constructor
  by_contra ple
  push_neg at ple
