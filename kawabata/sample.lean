@@ -71,3 +71,5 @@ theorem two : ∀ {m : ℕ}, m ≠ 0 → m ≠ 1 → 2 ≤ m := by
 theorem dt {a b c : ℕ } : a ∣ b → b ∣ c → a ∣ c := by
  exact Nat.dvd_trans
 >>>>>>> Stashed changes
+
+theorem
