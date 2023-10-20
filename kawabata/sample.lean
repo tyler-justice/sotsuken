@@ -72,4 +72,6 @@ theorem dt {a b c : ℕ } : a ∣ b → b ∣ c → a ∣ c := by
  exact Nat.dvd_trans
 >>>>>>> Stashed changes
 
-theorem
+def F : ℕ → ℕ
+ ∣ n = 2^(2^n) + 1
+#eval(F 1)
