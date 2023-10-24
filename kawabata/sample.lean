@@ -72,9 +72,9 @@ theorem dt {a b c : ℕ } : a ∣ b → b ∣ c → a ∣ c := by
  exact Nat.dvd_trans
 >>>>>>> Stashed changes
 
-def F : ℕ → ℕ  
+def F : ℕ → ℕ
  ∣ 0 = 3
- ∣ n = Π (n-1) F
+ ∣ n = Π i in range (n-1) F i
 
 theorem fermat_coprime (n m : ℕ ) : Nat.gcd Fn Fm = 1 := by
  by_contra ncp
