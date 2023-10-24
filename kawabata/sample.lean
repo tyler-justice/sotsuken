@@ -72,11 +72,16 @@ theorem dt {a b c : ℕ } : a ∣ b → b ∣ c → a ∣ c := by
  exact Nat.dvd_trans
 >>>>>>> Stashed changes
 
-def F : ℕ → ℕ
- ∣ 0 = 3
- ∣ n = Π i in range (n-1) F i
+def F:ℕ → ℕ
+  | 0 => 3
+  | n + 1 => Finset.prod n F
+#eval (F 2)
+
+def f : ℕ → ℕ 
+  | 0 => 3
+  | 
+
 
 theorem fermat_coprime (n m : ℕ ) : Nat.gcd Fn Fm = 1 := by
  by_contra ncp
  push_neg at ncp
-Π 
