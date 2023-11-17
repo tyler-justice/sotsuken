@@ -13,9 +13,9 @@ def seqA : Nat → Nat
 
 /- 入試問題　-/
 -- 等比数列
-example (p α: ℝ) (ppos : p > 0) (a : ℕ → ℝ) 
+example (p α: ℝ) (ppos : p > 0) (a : ℕ → ℝ)
   (h0 : a 0 = α)
-  (h1 : ∀n, a n.succ = p*(a n)) 
+  (h1 : ∀n, a n.succ = p*(a n))
     : a n = (p^n) *α := by
   induction' n with n ih
   · simp
@@ -29,26 +29,26 @@ example (p α: ℝ) (ppos : p > 0) (a : ℕ → ℝ)
     rw [← mul_assoc]
     nth_rewrite 1 [← Real.rpow_one p]
     rw [Real.rpow_add]
-    simp 
+    simp
     assumption
-    
+
 
 #check pow_add
 #check Monoid
 
 
-      
-example ( p n :ℝ) (ppos : p > 0) : p^(1 + n) = p^1*p^n := by
-  exact Real.rpow_add ppos 1 n 
 
-    
-  
+example ( p n :ℝ) (ppos : p > 0) : p^(1 + n) = p^1*p^n := by
+  exact Real.rpow_add ppos 1 n
+
+
+
 
 
 /- 素数の無限性 -/
 
 /- 証明駆動開発 -/
-sawaguchi
+--sawaguchi
 example (a : ℕ → ℝ) (h : ∀ n, a (n+1) = a n + (n+1)^2) (h0 :a 0 = 0):
   a n = (1/6)*n*(n+1)*(2*n + 1) := by
   induction' n with n ih
@@ -69,7 +69,7 @@ variable [CommRing R] (I : Ideal R)
 
 
 
-example ( J : Ideal R)  : I*J ≤ I ⊓ J := by 
+example ( J : Ideal R)  : I*J ≤ I ⊓ J := by
   exact Ideal.mul_le_inf
 
 
@@ -91,6 +91,5 @@ variable (f : S → S)
 #check f
 
 
-example  (H : Function.Injective f) : Function.Surjective f := by 
+example  (H : Function.Injective f) : Function.Surjective f := by
   exact Finite.surjective_of_injective H
-
