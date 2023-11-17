@@ -17,8 +17,6 @@ def aa : ℕ → ℚ
 f(x) = x² - N (N > 0)のときf(x) = 0 となるxをニュートン法で求める
 -/
 
-#check sub_eq_add_neg
-#check add_lt_add_right
 
 example (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.sqrt N) (h0 : a 0 = α0)
         (h : ∀n , a (n+1) = (1/2)*(a n + N / a n)) :
@@ -38,10 +36,13 @@ example (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.sq
     rw [←h''', sub_eq_add_neg]
     apply add_lt_add_right h''
   have h3 : (0 : ℝ) < 1 / 2 := by linarith
+  have h4 : 1 / 2 * |α0 + (N / α0 - 2 * Real.sqrt N)| < 1 / 2 * |α0 + -Real.sqrt N| := by
+    sorry
   calc
     |1 / 2 * (α0 + N / α0) - Real.sqrt N| = |1 / 2 * (α0 + N / α0 - 2 * Real.sqrt N)| := by ring_nf
                                         _ = |1 / 2| * |α0 + N / α0 - 2 * Real.sqrt N| := by rw [abs_mul]
                                         _ = 1 / 2 * |α0 + N / α0 - 2 * Real.sqrt N|   := by rw [abs_of_pos]
                                                                                             apply h3
                                         _ = 1 / 2 * |α0 + (N / α0 - 2 * Real.sqrt N)| := by rw [add_sub_assoc]
-                                        _ < 1 / 2 * |α0 + -Real.sqrt N|               := by apply add_lt_add_left h'''' α0
+                                        _ < 1 / 2 * |α0 + -Real.sqrt N|               := by apply h4
+                                        _ = 1 / 2 * |α0 - Real.sqrt N|                := by rw [←sub_eq_add_neg]
