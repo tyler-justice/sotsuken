@@ -17,7 +17,6 @@ def aa : ℕ → ℚ
 f(x) = x² - N (N > 0)のときf(x) = 0 となるxをニュートン法で求める
 -/
 
-
 example (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.sqrt N) (h0 : a 0 = α0)
         (h : ∀n , a (n+1) = (1/2)*(a n + N / a n)) :
         |a 1 - Real.sqrt N| < (1/2) * |a 0 - Real.sqrt N| := by
@@ -37,6 +36,12 @@ example (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.sq
     apply add_lt_add_right h''
   have h3 : (0 : ℝ) < 1 / 2 := by linarith
   have h4 : 1 / 2 * |α0 + (N / α0 - 2 * Real.sqrt N)| < 1 / 2 * |α0 + -Real.sqrt N| := by
+    apply (mul_lt_mul_left h3).mpr
+    apply lt_abs.mpr
+    left
+    rw [abs_of_nonneg]
+    apply add_lt_add_left h''''
+    --0 < α0 + (N / α0 - 2 * Real.sqrt N)の証明
     sorry
   calc
     |1 / 2 * (α0 + N / α0) - Real.sqrt N| = |1 / 2 * (α0 + N / α0 - 2 * Real.sqrt N)| := by ring_nf
