@@ -72,24 +72,26 @@ theorem dt {a b c : ℕ } : a ∣ b → b ∣ c → a ∣ c := by
  exact Nat.dvd_trans
 >>>>>>> Stashed changes
 
-def F:ℕ → ℕ
-  | 0 => 3
-  | n + 1 => Finset.prod n F
-#eval (F 2)
 
-def f (n : ℕ) : ℕ := n+1
-def (a : ℕ) := Π x in 5, f x
+def π' : ℕ → ℕ := Nat.count Nat.Prime
 
-#eval (f 2)
-
-
-def f' (n : ℕ) : ℕ  := 2 ^ (2^n) + 1
-
-#eval (Finset.prod 5 f)
-
-
-def add_square (n : ℕ) : ℕ  := n*(n+1)*(2*n + 1)
-
-theorem fermat_coprime (n m : ℕ ) : Nat.gcd Fn Fm = 1 := by
- by_contra ncp
- push_neg at ncp
+theorem primeCounting'_add_le {a k : ℕ} (h0 : 0 < a) (h1 : a < k) (n : ℕ) :
+    π' (k + n) ≤ π' k + Nat.totient a * (n / a + 1) :=by
+  calc
+    π' (k + n) ≤ ((range k).filter Prime).card + ((Ico k (k + n)).filter Prime).card := by
+      rw [primeCounting', count_eq_card_filter_range, range_eq_Ico, ←
+        Ico_union_Ico_eq_Ico (zero_le k) le_self_add, filter_union]
+      apply card_union_le
+    _ ≤ π' k + ((Ico k (k + n)).filter Prime).card := by
+      rw [primeCounting', count_eq_card_filter_range]
+    _ ≤ π' k + ((Ico k (k + n)).filter (Coprime a)).card := by
+      refine' add_le_add_left (card_le_of_subset _) k.primeCounting'
+      simp only [subset_iff, and_imp, mem_filter, mem_Ico]
+      intro p succ_k_le_p p_lt_n p_prime
+      constructor
+      · exact ⟨succ_k_le_p, p_lt_n⟩
+      · rw [coprime_comm]
+        exact coprime_of_lt_prime h0 (gt_of_ge_of_gt succ_k_le_p h1) p_prime
+    _ ≤ π' k + totient a * (n / a + 1) := by
+      rw [add_le_add_iff_left]
+      exact Ico_filter_coprime_le k n h0
