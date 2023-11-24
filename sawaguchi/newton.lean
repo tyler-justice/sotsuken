@@ -43,7 +43,7 @@ lemma n0 (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.s
     apply add_lt_add_right h''
   have h3 : (0 : ℝ) < 1 / 2 := by linarith
   have h5 : α0 ≠ 0 := by --N > 0 → Real.sqrt N > 0 → α0 > Real.sqrt N → α0 > 0 → α0 ≠ 0
-    apply pos_iff_ne_zero
+    apply pos_iff_ne_zero.mp α0 --なぜかこれが通らない
   have h4 : 1 / 2 * |α0 + (N / α0 - 2 * Real.sqrt N)| < 1 / 2 * |α0 + -Real.sqrt N| := by
     apply (mul_lt_mul_left h3).mpr
     apply sq_lt_sq.mp
