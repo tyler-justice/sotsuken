@@ -1,12 +1,11 @@
 import Mathlib
 
+open Nat
+open Finset
 
 #eval (π 5) --π(n)はn以下の素数の個数
 #eval (π' 5) --π'(n)はn未満の素数の個数
 #eval (Nat.totient 6) --n以下でnと互いに素な自然数の個数(オイラーのφ関数)
-
-open Nat
-open Finset
 
 theorem primeCounting'_add_le {a k : ℕ} (h0 : 0 < a) (h1 : a < k) (n : ℕ) :
     π' (k + n) ≤ π' k + Nat.totient a * (n / a + 1) :=by
