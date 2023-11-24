@@ -9,7 +9,7 @@ open Finset
 
 theorem primeCounting'_add_le {a k : ℕ} (h0 : 0 < a) (h1 : a < k) (n : ℕ) :
     π' (k + n) ≤ π' k + Nat.totient a * (n / a + 1) :=by
-  calc --Set.Ico は左が閉じた半開区間
+  calc --Set.Ico は左が閉じた半開区間 interval close open
     π' (k + n) ≤ ((range k).filter Nat.Prime).card + ((Ico k (k + n)).filter Nat.Prime).card := by
       rw [primeCounting', count_eq_card_filter_range, range_eq_Ico,
        ←Ico_union_Ico_eq_Ico (Nat.zero_le k) le_self_add, filter_union]
