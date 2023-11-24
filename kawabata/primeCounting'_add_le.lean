@@ -3,12 +3,12 @@ import Mathlib
 open Nat
 open Finset
 
-#eval (π 5) --π(n)はn以下の素数の個数
+#reduce (π 5) --π(n)はn以下の素数の個数
 #eval (π' 5) --π'(n)はn未満の素数の個数
-#eval (Nat.totient 6) --n以下でnと互いに素な自然数の個数(オイラーのφ関数)
+#eval (totient 6) --n以下でnと互いに素な自然数の個数(オイラーのφ関数)
 
 theorem primeCounting'_add_le {a k : ℕ} (h0 : 0 < a) (h1 : a < k) (n : ℕ) :
-    π' (k + n) ≤ π' k + Nat.totient a * (n / a + 1) :=by
+    π' (k + n) ≤ π' k + totient a * (n / a + 1) :=by
   calc --Set.Ico は左が閉じた半開区間 interval close open
     π' (k + n) ≤ ((range k).filter Nat.Prime).card + ((Ico k (k + n)).filter Nat.Prime).card := by
       rw [primeCounting', count_eq_card_filter_range, range_eq_Ico,
@@ -16,7 +16,7 @@ theorem primeCounting'_add_le {a k : ℕ} (h0 : 0 < a) (h1 : a < k) (n : ℕ) :
       apply card_union_le
     _ ≤ π' k + ((Ico k (k + n)).filter Nat.Prime).card := by
       rw [primeCounting', count_eq_card_filter_range]
-    _ ≤ π' k + ((Ico k (k + n)).filter (Nat.coprime a)).card := by
+    _ ≤ π' k + ((Ico k (k + n)).filter (coprime a)).card := by
       refine' add_le_add_left (card_le_of_subset _) k.primeCounting'
       simp only [subset_iff, and_imp, mem_filter, mem_Ico]
       intro p succ_k_le_p p_lt_n p_prime
@@ -30,7 +30,7 @@ theorem primeCounting'_add_le {a k : ℕ} (h0 : 0 < a) (h1 : a < k) (n : ℕ) :
 
 
 theorem Ico_filter_coprime_le {a : ℕ} (k n : ℕ) (a_pos : 0 < a) :
-    ((Ico k (k + n)).filter (Nat.coprime a)).card ≤ totient a * (n / a + 1) := by
+    ((Ico k (k + n)).filter (coprime a)).card ≤ totient a * (n / a + 1) := by
   conv_lhs => rw [← Nat.mod_add_div n a]
   induction' n / a with i ih
   · rw [← filter_coprime_Ico_eq_totient a k]
@@ -43,7 +43,7 @@ theorem Ico_filter_coprime_le {a : ℕ} (k n : ℕ) (a_pos : 0 < a) :
     simp only [Finset.le_eq_subset]
     exact Ico_subset_Ico rfl.le (add_le_add_left (le_of_lt (mod_lt n a_pos)) k)
   simp only [mul_succ]
-  simp_rw [← add_assoc] at ih ⊢ --⊢って何？
+  simp_rw [← add_assoc] at * --⊢って何？
   calc
     (filter a.coprime (Ico k (k + n % a + a * i + a))).card = (filter a.coprime
        (Ico k (k + n % a + a * i) ∪ Ico (k + n % a + a * i) (k + n % a + a * i + a))).card := by
