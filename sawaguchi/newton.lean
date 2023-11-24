@@ -17,7 +17,14 @@ def aa : ℕ → ℚ
 f(x) = x² - N (N > 0)のときf(x) = 0 となるxをニュートン法で求める
 -/
 
-example (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.sqrt N) (h0 : a 0 = α0)
+/-lemma ooo (j k l: ℝ) (h : j < k) : (l + j) ^ 2 < (l + k) ^ 2 := by
+  have h' :  (l + k) ^ 2 - (l + j) ^ 2 > 0 := by
+    calc
+      (l + k) ^ 2 - (l + j) ^ 2 = l^2 + 2*k*l + k^2 - (l^2 + 2*j*l + j^2) := by ring_nf
+                              _ = 2*(k - j)*l + k^2 -j^2    := by ring_nf
+  sorry-/
+
+lemma n0 (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.sqrt N) (h0 : a 0 = α0)
         (h : ∀n , a (n+1) = (1/2)*(a n + N / a n)) :
         |a 1 - Real.sqrt N| < (1/2) * |a 0 - Real.sqrt N| := by
   rw [h, h0]
@@ -35,14 +42,20 @@ example (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.sq
     rw [←h''', sub_eq_add_neg]
     apply add_lt_add_right h''
   have h3 : (0 : ℝ) < 1 / 2 := by linarith
+  have h5 : α0 ≠ 0 := by --N > 0 → Real.sqrt N > 0 → α0 > Real.sqrt N → α0 > 0 → α0 ≠ 0
+    apply pos_iff_ne_zero
   have h4 : 1 / 2 * |α0 + (N / α0 - 2 * Real.sqrt N)| < 1 / 2 * |α0 + -Real.sqrt N| := by
     apply (mul_lt_mul_left h3).mpr
-    apply lt_abs.mpr
-    left
-    rw [abs_of_nonneg]
-    apply add_lt_add_left h''''
-    --0 < α0 + (N / α0 - 2 * Real.sqrt N)の証明
-    sorry
+    apply sq_lt_sq.mp
+    apply pow_lt_pow_of_lt_left
+    · apply add_lt_add_left h''''
+    · calc
+        α0 + (N / α0 - 2 * Real.sqrt N) = α0 + N / α0 - 2 * Real.sqrt N                 := by rw [←add_sub_assoc]
+                                      _ ≥ 2 * Real.sqrt (α0 * N / α0) - 2 * Real.sqrt N := by sorry --相加相乗平均のコマンドがあれば使いたい
+                                      _ = 2 * Real.sqrt N - 2 * Real.sqrt N             := by rw [mul_div_cancel_left N h5]
+                                      _ = 0                                             := by ring
+    · linarith
+
   calc
     |1 / 2 * (α0 + N / α0) - Real.sqrt N| = |1 / 2 * (α0 + N / α0 - 2 * Real.sqrt N)| := by ring_nf
                                         _ = |1 / 2| * |α0 + N / α0 - 2 * Real.sqrt N| := by rw [abs_mul]
@@ -51,3 +64,12 @@ example (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.sq
                                         _ = 1 / 2 * |α0 + (N / α0 - 2 * Real.sqrt N)| := by rw [add_sub_assoc]
                                         _ < 1 / 2 * |α0 + -Real.sqrt N|               := by apply h4
                                         _ = 1 / 2 * |α0 - Real.sqrt N|                := by rw [←sub_eq_add_neg]
+
+example (a : ℕ → ℝ) (α0 : ℝ) (N : ℝ) (h2 : N > 0) (h1 : α0 > Real.sqrt N) (h0 : a 0 = α0)
+        (h : ∀n , a (n+1) = (1/2)*(a n + N / a n)) :
+        |a (n + 1) - Real.sqrt N| < (1/2) * |a n - Real.sqrt N| := by
+  induction' n with n ih
+  · simp
+    rw [←mul_one 2⁻¹, inv_mul_eq_div]
+    apply n0
+    apply h2
