@@ -3,7 +3,7 @@ import Mathlib
 open Nat
 open Finset
 
-#reduce (π 5) --π(n)はn以下の素数の個数
+#eval (π 5) --π(n)はn以下の素数の個数
 #eval (π' 5) --π'(n)はn未満の素数の個数
 #eval (totient 6) --n以下でnと互いに素な自然数の個数(オイラーのφ関数)
 
