@@ -16,4 +16,5 @@ import Mathlib
   https://leanprover-community.github.io/mathlib-overview.html
 
   からどのように環とそのイデアルを打ち込めば良いか考えてみてください.
+  ササキ
 -/
