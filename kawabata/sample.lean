@@ -9,7 +9,7 @@ import Mathlib
 =======
  -/
 
- 
+
 theorem exists_prime_factor {n : ℕ } (h : 2 ≤ n) :
  ∃ p : ℕ , Nat.Prime p ∧ p ∣ n := by
 
@@ -36,12 +36,12 @@ theorem exists_prime_factor {n : ℕ } (h : 2 ≤ n) :
 open Nat --open Natで各タクティクのNat消せる--
 theorem primes_infinite : ∀ n, ∃ p > n, Nat.Prime p := by
  intro n
-  
+
  have h : 2 ≤ factorial (n + 1) + 1
  { apply Nat.succ_le_succ
    exact Nat.succ_le_of_lt (Nat.factorial_pos _)}
  rcases exists_prime_factor h with ⟨p, pp, pdvd⟩
- exists p  
+ exists p
   --refine で何故かnogoal--
  constructor
  by_contra ple
@@ -70,4 +70,7 @@ theorem two : ∀ {m : ℕ}, m ≠ 0 → m ≠ 1 → 2 ≤ m := by
 
 theorem dt {a b c : ℕ } : a ∣ b → b ∣ c → a ∣ c := by
  exact Nat.dvd_trans
->>>>>>> Stashed changes
+>>>>>>> Stashed
+
+
+#eval (π 5)
