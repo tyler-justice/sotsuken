@@ -13,7 +13,6 @@ lemma coprime_consecutive' (n : ℕ) : Nat.coprime (n + 1) n :=by
  rw [coprime_self_add_left]
  apply coprime_one_right
 
-
 lemma disjoint_dedup  (l1 l2 : List ℕ) (h : Disjoint l1 l2) :
                       dedup (l1++l2) = dedup l1 ++ dedup l2 := by
  induction' l1 with a l1' IH;
@@ -36,9 +35,9 @@ lemma disjoint_dedup  (l1 l2 : List ℕ) (h : Disjoint l1 l2) :
 
 /-ここからメインの証明-/
 
-theorem saidak (k : ℕ) (kge2 : 2 ≤ k) (N : ℕ → ℕ) (hN0 : N 0 = k)
+theorem saidak' (k : ℕ) (kge2 : 2 ≤ k) (N : ℕ → ℕ) (hN0 : N 0 = k)
                (hN : ∀ m, N (m + 1) = N m * (N m + 1))
-               : countP Nat.Prime (dedup (factors (N (m + 1)))) ≥ m + 2 := by
+               : length (dedup (factors (N (m + 1)))) ≥ m + 2 := by
 
  induction' m with i ih
  rw [hN,zero_eq,hN0,zero_add]
@@ -51,7 +50,18 @@ theorem saidak (k : ℕ) (kge2 : 2 ≤ k) (N : ℕ → ℕ) (hN0 : N 0 = k)
  have h1 : dedup (factors (k * (k + 1))) ~ dedup ((factors k) ++ factors (k + 1)) :=by
   apply Perm.dedup this
 
- rw [Perm.countP_eq _ h1]
+ rw [Perm.length_eq h1]
+
+ set l1 := factors k
+ set l2 := factors (k + 1)
+
+ have dup_coprime : dedup (l1 ++ l2) = dedup l1 ++ dedup l2 :=by
+  apply disjoint_dedup
+  refine List.Disjoint.symm (coprime_factors_disjoint ?hab')
+  apply coprime_consecutive'
+
+ rw [dup_coprime , ge_iff_le]
+ rw [length_append]
 
  have l1n0 : factors k ≠ [] :=by
   by_contra l1e0
@@ -72,16 +82,6 @@ theorem saidak (k : ℕ) (kge2 : 2 ≤ k) (N : ℕ → ℕ) (hN0 : N 0 = k)
   { push_neg ; exact Iff.mp (two_le_iff (k + 1)) k1ge2 }
   contradiction
 
- set l1 := factors k
- set l2 := factors (k + 1)
-
- have dup_coprime : dedup (l1 ++ l2) = dedup l1 ++ dedup l2 :=by
-  apply disjoint_dedup
-  refine List.Disjoint.symm (coprime_factors_disjoint ?hab')
-  apply coprime_consecutive'
-
- rw [dup_coprime , countP_append , ge_iff_le]
-
  have l1ex : ∃ (a' : ℕ) , a' ∈ l1 :=by
   apply exists_mem_of_ne_nil ; exact l1n0
 
@@ -92,9 +92,13 @@ theorem saidak (k : ℕ) (kge2 : 2 ≤ k) (N : ℕ → ℕ) (hN0 : N 0 = k)
 
  rcases dl1ex with ⟨a , amem⟩
 
- have ap : Nat.Prime a :=by
-  have : a ∈ factors k :=by { rw [←mem_dedup] ; exact amem }
-  apply prime_of_mem_factors ; exact this
+ have dl1n0 : dedup l1 ≠ [] :=by
+  apply ne_nil_of_mem
+  exact amem
+
+ have length1 : 1 ≤ length (dedup l1) :=by
+  rw [←length_pos] at dl1n0
+  exact dl1n0
 
  have l2ex : ∃ (b' : ℕ) , b' ∈ l2 :=by
   apply exists_mem_of_ne_nil ; exact l2n0
@@ -106,28 +110,20 @@ theorem saidak (k : ℕ) (kge2 : 2 ≤ k) (N : ℕ → ℕ) (hN0 : N 0 = k)
 
  rcases dl2ex with ⟨b , bmem⟩
 
- have bp : Nat.Prime b :=by
-  have : b ∈ factors (k+1) :=by { rw [←mem_dedup] ; exact bmem }
-  apply prime_of_mem_factors ; exact this
-
- have countP1 : 1 ≤ countP Nat.Prime (dedup l1) :=by
-  rw [←lt_iff_add_one_le , countP_pos] ; use a
-  constructor
-  exact amem
-  exact decide_eq_true ap
-
- have countP2 : 1 ≤ countP Nat.Prime (dedup l2) :=by
-  rw [←lt_iff_add_one_le , countP_pos] ; use b
-  constructor
+ have dl2n0 : dedup l2 ≠ [] :=by
+  apply ne_nil_of_mem
   exact bmem
-  exact decide_eq_true bp
+
+ have length2 : 1 ≤ length (dedup l2) :=by
+  rw [←length_pos] at dl2n0
+  exact dl2n0
 
  rw [← one_add_one_eq_two]
- exact Nat.add_le_add countP1 countP2
+ exact Nat.add_le_add length1 length2
 
 --ここからsucc--
 
- have nsucc : N (succ i + 1) =N (i + 1) * (N (i + 1) + 1) :=by
+ have nsucc : N (succ i + 1) = N (i + 1) * (N (i + 1) + 1) :=by
   rw [succ_eq_add_one] ; exact hN (i + 1)
 
  rw [nsucc]
@@ -136,10 +132,25 @@ theorem saidak (k : ℕ) (kge2 : 2 ≤ k) (N : ℕ → ℕ) (hN0 : N 0 = k)
   apply perm_factors_mul_of_coprime
   apply coprime_consecutive (N (i + 1))
 
- have h2 : dedup (factors ((N (i + 1)) * (N (i + 1) + 1))) ~ dedup ((factors (N (i + 1))) ++ factors ((N (i + 1)) + 1))
- { apply Perm.dedup this }
+ have h2 : dedup (factors ((N (i + 1)) * (N (i + 1) + 1))) ~
+           dedup ((factors (N (i + 1))) ++ factors ((N (i + 1)) + 1)) :=by
+  apply Perm.dedup this
 
- rw [Perm.countP_eq _ h2]
+ rw [Perm.length_eq h2]
+
+ set l3 := factors (N (succ i))
+ set l4 := factors (N (succ i) + 1)
+
+ have dup_coprime : dedup (l3 ++ l4) = dedup l3 ++ dedup l4 :=by
+  apply disjoint_dedup
+  refine List.Disjoint.symm (coprime_factors_disjoint ?hab'')
+  apply coprime_consecutive'
+
+ rw [dup_coprime , length_append , ge_iff_le , succ_eq_add_one]
+
+ have : i + 1 + 2 = i + 2 + 1 :=by { exact rfl }
+ rw [this]
+ rw [ge_iff_le] at ih
 
  have l4n0 : factors (N (i + 1) + 1) ≠ [] :=by
   by_contra l4e0
@@ -160,19 +171,6 @@ theorem saidak (k : ℕ) (kge2 : 2 ≤ k) (N : ℕ → ℕ) (hN0 : N 0 = k)
    exact Nat.ne_of_gt this
   contradiction
 
- set l3 := factors (N (succ i))
- set l4 := factors (N (succ i) + 1)
-
- have dup_coprime : dedup (l3 ++ l4) = dedup l3 ++ dedup l4 :=by
-  apply disjoint_dedup
-  refine List.Disjoint.symm (coprime_factors_disjoint ?hab'')
-  apply coprime_consecutive'
-
- rw [dup_coprime , countP_append , ge_iff_le , succ_eq_add_one]
- have : i + 1 + 2 = i + 2 + 1 :=by { exact rfl }
- rw [this]
- rw [ge_iff_le] at ih
-
  have l4ex : ∃ (d' : ℕ) , d' ∈ l4 :=by
   apply exists_mem_of_ne_nil ; exact l4n0
 
@@ -183,15 +181,13 @@ theorem saidak (k : ℕ) (kge2 : 2 ≤ k) (N : ℕ → ℕ) (hN0 : N 0 = k)
 
  rcases dl4ex with ⟨d , dmem⟩
 
- have dp : Nat.Prime d :=by
-  have : d ∈ factors (N (i + 1 ) + 1) :=by { rw [←mem_dedup] ; exact dmem }
-  apply prime_of_mem_factors
-  exact this
-
- have countP4 : 1 ≤ countP Nat.Prime (dedup l4) :=by
-  rw [←lt_iff_add_one_le , countP_pos] ; use d
-  constructor
+ have dl4n0 : dedup l4 ≠ [] :=by
+  apply ne_nil_of_mem
   exact dmem
-  exact decide_eq_true dp
 
- exact Nat.add_le_add ih countP4
+ have length4 : 1 ≤ length (dedup l4) :=by
+  rw [←length_pos] at dl4n0
+  exact dl4n0
+
+ rw [← one_add_one_eq_two]
+ exact Nat.add_le_add ih length4
